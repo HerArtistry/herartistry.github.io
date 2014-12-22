@@ -3,4 +3,4 @@ layout: post
 title: Scalability
 ---
 
-Successfully hosted on Github Pages using Jekyll and the awesome ["Jekyll Now"](https://github.com/barryclark/jekyll-now) by Barry Clark.
+I am working on developing a highly scalable and highly available SaaS product. There are various challenges in achieving both of these - especially in the .Net world that seems to lag behind, once again.
