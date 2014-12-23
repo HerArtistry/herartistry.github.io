@@ -44,12 +44,15 @@ To extract the data, we simply need to parse the JSON data and retrieve the labe
 There are different kinds of fields and value are stored differently for some of the field types. For example, a select field will store the integer value not the text, which needs to be retrieved form the list of options specified in the JSON data. In order to support multiple field types that might be storing values differently, and to conform to the open closed principle, I decided to use the Chain of Responsibility pattern (more on this pattern in a future post).
 
 ### Creating and Storing the Dynamic Object ###
+A simple way to create a dynamic object is by using ExpandoObject. ExpandoObject implements IDictionary, hence, it allows us to create and set properties using the indexer, which is perfect in our scenario as the properties to be created are specified as strings in the JSON object representing the form's data. However, in order to use indexers, you need to cast the ExpandoObject to a dictionary (IDictionary<string, object> to be precise). Therefore, to create our dynamic object, we just need to loop through all the fields and create a property per field:
 
+    dynamic form = new ExpandoObject();
+    foreach (var field in fields)
+    {
+	    var propertyName = _getValidPropertyName(field.label.ToString());
+	    ((IDictionary<string, object>)form)[propertyName] = field.value;
+    }
 
-So from the above JSON data, I would expect an object with two properties (representing the two fields), namely, Name and Priority with the values "Name of Incident" and "High" respectively.
-
-
-
-The database we are using is RavenDB, which happens to support dynamic object storage. 
+We can now store the form object, this will create a new collection called ExpandoObject that contains properties representing all the fields from the JSON object with their correct values as depicted below:
 
 ![RavenDB](/images/Dynamic-objects-in-RavenDB.png "RavenDB")
