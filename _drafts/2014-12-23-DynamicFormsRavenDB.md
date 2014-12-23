@@ -51,3 +51,5 @@ So from the above JSON data, I would expect an object with two properties (repre
 
 
 The database we are using is RavenDB, which happens to support dynamic object storage. 
+
+![RavenDB](/images/Dynamic-objects-in-RavenDB.png "RavenDB")
