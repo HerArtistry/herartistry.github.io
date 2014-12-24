@@ -6,7 +6,7 @@ title: Scalability - Part 1
 In this series of posts, I will go through the challenges experienced developing a highly scalable and highly available SaaS product. This was especially challenging because the .Net world seems to lag behind, once again, in terms of information regarding architectures supporting high scalability as well as frameworks/libraries.
 
 ## Scaling up vs scaling out ##
-The first question you might want to ask yourself when striving for scalability is whether you want to sale out or up? When scaling up (vertical scaling), you simply throw in more hardware. While scaling out (horizontal scaling), is where you add more servers. 
+The first question you might want to ask yourself when striving for scalability is whether you want to scale out or up? When scaling up (vertical scaling), you simply throw in more hardware. While scaling out (horizontal scaling), is where you add more servers. 
 
 **Scaling up** is generally easier to implement as you have one application to develop, test, host and deploy. I say generally because I have seen, and unfortunately inherited, systems that are just a bunch of web services (JBOWS) hosted in one server. In my opinion, if you have no intention of scaling out the system, don't abstract parts of the system behind a web service. If on the other hand, you do want to scale out, then JBOWS is not the answer (more on that in a future post). 
 
