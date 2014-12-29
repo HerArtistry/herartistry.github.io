@@ -23,3 +23,8 @@ Adopting this approach means the overall system is divided into vertical slices,
 
 ###Event-Driven Architecture and SOA###
 As stated on this MSDN article, "Event-driven architecture is an architectural style that builds on the fundamental aspects of event notifications to facilitate immediate information dissemination and reactive business process execution." Basically, services in SOA generally communicate through events. A service fires an event describing a meaningful state change, and other interested service subscribe to such events and carry out any necessary actions required when such an event is fired. This is a very powerful architecture that allows significant scalability and decouples the services in the system as the service that fires the event does not know, and does not care, which other services are consuming this event and why.
+
+**What to include in an event?** There are two kind of events: internal and public. Internal events are ones that are only local to the service firing them. Public events are those that are broadcast to all services. As stated above, services should not share data, therefore, public events should have nothing but IDs. Internal events, on the other hand, can have data and can derive from the public events to make us of [polymorphic message dispatch](http://www.udidahan.com/2011/01/13/polymorphism-and-messaging/) - provided your service bus supports it.
+
+**So.... how is the relevant data disseminated?** through UI Composition. If you have not heard of the term before, then I recommend reading [this](http://www.udidahan.com/2012/06/23/ui-composition-techniques-for-correct-service-boundaries/) article by Udi Dahan.
+
