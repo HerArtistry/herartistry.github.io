@@ -37,7 +37,7 @@ As stated on this MSDN article, "Event-driven architecture is an architectural s
 
 In order to associate relevant data saved to disparate services, the ID is generated when you get to the composite view and then used in all services. E.g. when the a new user is created, a user ID is generated and used by both the users and credentials services. This way, when the user service is done persisting the user details, it fires an event containing nothing but the user ID. The credentials service can use this ID to pull up the credential information associated with that user.
 
-Note: If the user created event is fired before the credentials service has stored the user's credentials, then you just need to retry again as it will eventually be created. This is how an eventual consistent system works and you need to cater for this. NServicebus has an exponential back-off retry feature that come in handy in such situations.
+Note: If the user created event is fired before the credentials service has stored the user's credentials, then you just need to retry again as it will eventually be created. This is how an eventual consistent system works and you need to cater for this. NServicebus has an exponential back-off retry feature that comes in handy in such situations.
 
 Note: You should not enforce referential integrity across service boundaries.
 
