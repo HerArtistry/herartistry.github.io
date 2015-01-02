@@ -16,7 +16,7 @@ Scaling up also means less licensing cost. However, the hardware costs are very 
 
 We have decided to go with a scale-out strategy as it gives us a lot more flexibility and it facilitates meeting our product's needs in terms of high availability (99.999% or five nines), scalability and resilience. 
 
-In order to maximize the benefits and scale out effectively, the system needs to be divided into self-contained, low coupled services. This way, you can replace, scale (run multiple instances of the same service) and upgrade services individually without affecting the overall system and its availability.
+In order to maximize the benefits and scale out effectively, the system needs to be divided into self-contained, low coupled, vertically sliced services. This way, you can replace, scale (run multiple instances of the same service) and upgrade services individually without affecting the overall system and its availability.
 
 In the next post, I will delve deeper into services in a service oriented architecture (SOA) and how to architecture SOA for scaling out.
  
