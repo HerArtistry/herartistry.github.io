@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Scalability - Part 2
+title: Scalability - Part 2: EventDriven
 ---
 
 In the previous post in this series [add link], I spoke briefly about scaling up vs out and why we chose scaling out. In this post, I will delve deeper into services that aid scaling out strategies.
@@ -34,17 +34,21 @@ A system based on command messages as the form of communication will quickly bec
 
 >Consider the case where Service C now must perform some action in the context of Service A's activities. We now need to update Service A to send a command message to Service C as well. Imagine how the complexity here can grow when we have a large number of services!
 
-This is exactly why Event messages are preferred as they eliminate this coupling. Using the above example, if Service A's activity requires service B. Then service A fires an event that service B is subscribed to. Service B then carries out it part using information stored within it when it handles that event. If another service is now needed, it simply subscribes to the event and executes its part when the event is fired.
+This is exactly why Event messages are preferred as they eliminate this coupling. Using the above example, if Service A's activity requires service B. Then service A fires an event that service B is subscribed to. Service B then carries out its part using information stored within it when it handles that event. If another service is now needed, it simply subscribes to the event and executes its part when the event is fired.
 
 ####Event-Driven Architecture and SOA####
 As stated on this MSDN article, "Event-driven architecture is an architectural style that builds on the fundamental aspects of event notifications to facilitate immediate information dissemination and reactive business process execution." Basically, services in SOA generally communicate through events. A service fires an event describing a meaningful state change, and other interested service subscribe to such events and carry out any necessary actions required when such an event is fired. This is a very powerful architecture that allows significant scalability and decouples the services in the system as the service that fires the event does not know, and does not care, which other services are consuming this event and why.
 
 **What to include in an event?** Events should only have IDs as data should not leak outside the service boundaries for the reasons specified at the beginning of this article. If more information is needed, say for auditing, then a local auditing handler should be created and [polymorphic message dispatch](http://www.udidahan.com/2011/01/13/polymorphism-and-messaging/) should be used.
 
-###UI Composition###
-**So.... how is the relevant data disseminated?** through UI Composition. If you have not heard of the term before, then I recommend reading [this](http://www.udidahan.com/2012/06/23/ui-composition-techniques-for-correct-service-boundaries/) article by Udi Dahan.
+If events only include IDs and event handlers should only use local data, then **how is the relevant data disseminated?** This is done through UI Composition and I will be covering that in the next part of this series.
 
-**TL;DR:** Every service would provide partial views to present the data it has. When a particular screen contains data from different services, then these partial views are mashed-up together to create one "Composite UI" view.
+##Part 3: UI Composition (should be separate post)#
+
+###UI Composition###
+If you have not heard of the term before, then I recommend reading [this](http://www.udidahan.com/2012/06/23/ui-composition-techniques-for-correct-service-boundaries/) article by Udi Dahan.
+
+Every service would provide partial views to present the data it has. When a particular screen contains data from different services, then these partial views are mashed-up together to create one "Composite UI" view.
 
 In order to work effectively with event-driven SOA, the business processes are re-modelled as an asynchronous series of events. For example, a user registration process may consist of creating users, creating their log-in credentials, e-mailing the users a link to re-set their password. Traditionally, this may be presented as a wizard with a linear synchronous process where each step needs to be completed in order to move to the next step. In Event Driven SOA, the users' details and credentials are  asynchronously saved at the same time and they share the user ID. Once the user is created by the users service, a UserCreated event containing only the user ID  is fired. The credentials service, which is subscribed to this event, then uses the user ID contained in the event to retrieve the user's credentials, it then creates a reset password token (just a Guid ID) and composes the credentials' specific password reset e-mail. It then sends a command to the e-mail service to send the e-mail. The reason we can fire a UserCreated event with just an ID, is that all the user's relevant credentials information is already saved in the credentials service through the **Composite UI**.
 
