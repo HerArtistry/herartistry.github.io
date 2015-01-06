@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Scalability - Part 2: EventDriven
+title: Scalability - Part 2: Event-Driven SOA
 ---
 
 In the previous post in this series [add link], I spoke briefly about scaling up vs out and why we chose scaling out. In this post, I will delve deeper into services that aid scaling out strategies.
