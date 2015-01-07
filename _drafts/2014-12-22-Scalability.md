@@ -1,11 +1,10 @@
 ---
 layout: post
-title: Scalability - Part 1
+title: Scalability and SOA - Part 1
 ---
 
-In this series of posts, I will go through the challenges experienced developing a highly scalable and highly available SaaS product. 
+In this series of posts, I will go through the challenges experienced developing a highly scalable and highly available SaaS product using a Service Oriented Architecture. 
 
-## Scaling up vs scaling out ##
 The first question you might want to ask yourself when designing a scalable system is whether you want to scale out or up? When scaling up (vertical scaling), you simply throw in more hardware. While scaling out (horizontal scaling), is where you add more servers. 
 
 **Scaling up** is generally easier to implement as you have one application to develop, test, host and deploy. I say generally because I have seen, and unfortunately inherited, systems that are just a bunch of web services (JBOWS) hosted in one server. In my opinion, if you have no intention of scaling out the system, don't abstract parts of the system behind a web service as, not only does this add no value, it drags you into the trap of the fallacies of distributed systems. If on the other hand, you do want to scale out, then JBOWS is not the answer (more on that in a future post). 
@@ -17,6 +16,7 @@ Scaling up also means less licensing cost. However, the hardware costs are very 
 We have decided to go with a scale-out strategy as it gives us a lot more flexibility and it facilitates meeting our product's needs in terms of high availability (99.999% or five nines), scalability and resilience. 
 
 **Layered SOA is not the answer**
+
 A layered service model is where the system is divided into horizontal slices. These are mainly three layers, namely: process, task and entity services. Bill Poole defines those as:
 
 >The purpose of entity services is to provide an abstracted view of business document repositories. The actual structure of the underlying data and the platform holding the data are abstracted into the form of entity service contracts.
@@ -25,19 +25,11 @@ A layered service model is where the system is divided into horizontal slices. T
 
 >Process services are then created in support of business processes. Each process service wires up any number of task services in support of a specific business process. Process services can also "invoke" other process services when there are sub-processes to be reused by those processes.
 
-These service need to communicate with each other in a synchronous RPC because non of the services can fulfil any non-trivial business processes on its own. [Synchronous request/reply is bad](http://bill-poole.blogspot.co.uk/2008/03/synchronous-requestreply-is-bad.html) and this layered service model consequently suffers due to:
-cross-service transactions
-performance
-cohesion
-coupling
-complexity
+These service need to communicate with each other in a synchronous RPC because non of the services can fulfil any non-trivial business processes on its own. [Synchronous request/reply is bad](http://bill-poole.blogspot.co.uk/2008/03/synchronous-requestreply-is-bad.html) and this layered service model consequently suffers in terms of performance, coupling, complexity to name but a few. This model introduces inter-dependencies between services that leads to transactions spanning multiple services. Cross-service transactions means services are not as autonomous as they ought to be as they affect each others execution and the increase the chances of deadlocks among services, which will hurt the performance of the system. Layered service models also have low cohesion  Services of this nature also suffer from temporal coupling as all services need to be up and running in order for the system to perform properly. For a more detailed explanation, check out Bill Poole's [layered service models are bad](http://bill-poole.blogspot.co.uk/2008/05/layered-service-models-are-bad.html)
 
-**Scaling out and vertically sliced services**
+**Scaling out and vertical services**
 
 In order to maximize the benefits and scale out effectively, the system needs to be divided into self-contained, low coupled, vertically sliced services. This way, you can replace, scale (run multiple instances of the same service) and upgrade services individually without affecting the overall system and its availability. Additionally, this also allows you to identify bottlenecks in your system at a more granular level and scale them separately; reducing the cost of scaling out. For example, instead of provisioning a new high-end server to address the whole business or data layers, you only need to spin up a regular server, or a low spec-ed one depending on requirements, that just targets the users service. 
-
-**Centralised vs. decentralised databases**
-When 
 
 In the next post, I will delve deeper into services in a service oriented architecture (SOA) and how to architecture SOA for scaling out.
  
