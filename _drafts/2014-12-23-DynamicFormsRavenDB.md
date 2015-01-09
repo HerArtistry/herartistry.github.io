@@ -41,6 +41,12 @@ To extract the data, we simply need to parse the JSON data and retrieve the labe
 
     dynamic form = SimpleJson.DeserializeObject(formData);
 
+
+>Note: In order to enable dynamic support in SimpleJson, you need to comment out the following line in SimpleJson.cs:
+    
+>// NOTE: uncomment the following line to enable dynamic support.    
+>// #define SIMPLE\_JSON\_DYNAMIC
+
 There are different kinds of fields and value are stored differently for some of the field types. For example, a select field will store the integer value not the text, which needs to be retrieved form the list of options specified in the JSON data. In order to support multiple field types that might be storing values differently, and to conform to the open closed principle, I decided to use the Chain of Responsibility pattern (more on this pattern in a future post).
 
 ### Creating and Storing the Dynamic Object ###

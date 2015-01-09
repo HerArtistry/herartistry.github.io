@@ -1,4 +1,7 @@
-##Part 3: UI Composition (should be separate post)#
+---
+layout: post
+title: Scalability and SOA - Part 3: UI Composition
+---
 
 ###UI Composition###
 If you have not heard of the term before, then I recommend reading [this](http://www.udidahan.com/2012/06/23/ui-composition-techniques-for-correct-service-boundaries/) article by Udi Dahan.
