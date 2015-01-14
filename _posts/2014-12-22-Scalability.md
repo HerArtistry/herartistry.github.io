@@ -15,6 +15,8 @@ Scaling up also means less licensing cost. However, the hardware costs are very 
 
 We have decided to go with a scale-out strategy as it gives us a lot more flexibility and it facilitates meeting our product's needs in terms of high availability (99.999% or five nines), scalability and resilience. 
 
+###Architecting for a scaling-out strategy###
+
 **Layered SOA is not the answer**
 
 A layered service model is where the system is divided into horizontal slices. These are mainly three layers, namely: process, task and entity services. Bill Poole defines those as:
@@ -25,7 +27,7 @@ A layered service model is where the system is divided into horizontal slices. T
 
 >Process services are then created in support of business processes. Each process service wires up any number of task services in support of a specific business process. Process services can also "invoke" other process services when there are sub-processes to be reused by those processes.
 
-These service need to communicate with each other in a synchronous RPC because non of the services can fulfil any non-trivial business processes on their own. [Synchronous request/reply is bad](http://bill-poole.blogspot.co.uk/2008/03/synchronous-requestreply-is-bad.html) and this layered service model consequently suffers in terms of performance, coupling, complexity to name but a few. This model introduces inter-dependencies between services that leads to transactions spanning multiple services. Cross-service transactions means services are not as autonomous as they ought to be as they affect each others execution and the increase the chances of deadlocks among services, which will hurt the performance of the system. Layered service models also have low cohesion  Services of this nature also suffer from temporal coupling as all services need to be up and running in order for the system to perform properly. For a more detailed explanation, check out Bill Poole's [layered service models are bad](http://bill-poole.blogspot.co.uk/2008/05/layered-service-models-are-bad.html)
+These service need to communicate with each other through synchronous RPC calls because non of the services can fulfil any non-trivial business processes on their own. [Synchronous request/reply is bad](http://bill-poole.blogspot.co.uk/2008/03/synchronous-requestreply-is-bad.html) and this layered service model consequently suffers in terms of performance, coupling, complexity to name but a few. This model introduces inter-dependencies between services that leads to transactions spanning multiple services. Cross-service transactions means services are not as autonomous as they ought to be as they affect each others execution and the increase the chances of deadlocks among services, which will hurt the performance of the system. Layered service models also have low cohesion  Services of this nature also suffer from temporal coupling as all services need to be up and running in order for the system to perform properly. For a more detailed explanation, check out Bill Poole's [layered service models are bad](http://bill-poole.blogspot.co.uk/2008/05/layered-service-models-are-bad.html)
 
 **Scaling out and vertical services**
 
