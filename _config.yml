@@ -1,6 +1,6 @@
 # Site wide configuration
 
-title:            Site Title
+title:            
 locale:           en_GB
 url:        http://www.ashrafmageed.com      
 
@@ -26,9 +26,9 @@ kramdown:
 
 # Site owner
 owner:
-  name: Your Name
+  name: Ashraf Mageed
   avatar: bio-photo.jpg
-  bio: "Describe your self."
+  bio: ""
   email: 
   disqus-shortname: 
   twitter: #username
