@@ -3,12 +3,12 @@ layout: post
 title: Scalability and SOA - Part 2: Event-Driven SOA
 ---
 
-In the previous post in this series [add link], I spoke briefly about scaling up vs out and why we chose scaling out. In this post, I will delve deeper into services that aid scaling out strategies.
+In the previous post in this series [add link], I spoke briefly about scaling up vs out, why we chose scaling out and why layered service models are not the answer. In this post, I will delve deeper into vertical services and how they help with scaling out strategies.
 
 #### Services in Service Oriented Architecture ####
 If you are working with SOAs, then I highly recommend attending Udi Dahan's Advanced Distributed Systems Design course, or alternatively buying the recordings. 
 
-So, what is a service?  as Udi states it: "a service is the technical authority for a business capability". What does this mean? It means a service is responsible for everything related to a specific business capability. It means UI, presentation logic, business logic and data storage for that business capability is contained within the boundaries of the service and the actual data does not leak out of the service boundaries. Why? There are numerous advantages for doing this:
+So, what is a service?  as Udi states it: "a service is the technical authority for a business capability". What does this mean? It means the UI, presentation logic, business logic and data storage for that business capability is contained within the boundaries of the service and the actual data does not leak out of the service boundaries. Why? There are numerous advantages for doing this:
 
 - When data leaks out of a service, logic almost always follows. This would lead to code duplication in terms of both models/entities and business logic. Additionally, inter-service dependencies creates chatty interfaces between services.
 

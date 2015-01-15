@@ -1,6 +1,8 @@
 ---
 layout: post
 title: Scalability and SOA - Part 1
+comments: true
+tags: [SOA, Service Oriented Architecture, Scalability]
 ---
 
 In this series of posts, I will go through the challenges experienced developing a highly scalable and highly available SaaS product using a Service Oriented Architecture. 
