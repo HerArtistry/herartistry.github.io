@@ -5,7 +5,7 @@ comments: true
 tags: [SOA, Service Oriented Architecture, Scalability]
 ---
 
-In the [previous post](http://www.ashrafmageed.com/Scalability/) in this series, I spoke briefly about scaling up vs out, why we chose scaling out and why layered service models are not the answer. In this post, I will delve deeper into vertical services and how they help with scaling out strategies.
+In the [previous post](http://www.ashrafmageed.com/Scalability/) in this series, I wrote about scaling up vs out, why we chose scaling out and why layered service models are not the answer. In this post, I will delve deeper into vertical services and how they help with scaling out strategies.
 
 #### Services in Service Oriented Architecture ####
 If you are working with SOAs, then I highly recommend attending Udi Dahan's Advanced Distributed Systems Design course, or alternatively buying the recordings. 
@@ -16,7 +16,7 @@ So, what is a service?  as Udi states it: "a service is the technical authority 
 
 - The service has no dependency on other services when fulfilling a business transaction. Hence, there are no calls over the network, no hindrance due to the [fallacies of distributed systems](http://en.wikipedia.org/wiki/Fallacies_of_distributed_computing). The entire transaction is carried out in-process.
 
-- As every service has it's own data that it does not share with any other service, only the service responsible for the data can alter the data. This ensures that the data can only ever be changed according to the business rules defined by this service (encapsulation).
+- As every service has its own data that it does not share with any other service, only the service responsible for the data can alter the data. This ensures that the data can only ever be changed according to the business rules defined by this service (encapsulation).
 
 - Since every service contains all the data it needs to service requests, services are not coupled to each other. This is crucial when building a scalable system.
 
