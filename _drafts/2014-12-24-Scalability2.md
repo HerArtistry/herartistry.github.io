@@ -1,16 +1,18 @@
 ---
 layout: post
 title: Scalability and SOA - Part 2: Event-Driven SOA
+comments: true
+tags: [SOA, Service Oriented Architecture, Scalability]
 ---
 
-In the previous post in this series [add link], I spoke briefly about scaling up vs out, why we chose scaling out and why layered service models are not the answer. In this post, I will delve deeper into vertical services and how they help with scaling out strategies.
+In the [previous post](http://www.ashrafmageed.com/Scalability/) in this series, I spoke briefly about scaling up vs out, why we chose scaling out and why layered service models are not the answer. In this post, I will delve deeper into vertical services and how they help with scaling out strategies.
 
 #### Services in Service Oriented Architecture ####
 If you are working with SOAs, then I highly recommend attending Udi Dahan's Advanced Distributed Systems Design course, or alternatively buying the recordings. 
 
 So, what is a service?  as Udi states it: "a service is the technical authority for a business capability". What does this mean? It means the UI, presentation logic, business logic and data storage for that business capability is contained within the boundaries of the service and the actual data does not leak out of the service boundaries. Why? There are numerous advantages for doing this:
 
-- When data leaks out of a service, logic almost always follows. This would lead to code duplication in terms of both models/entities and business logic. Additionally, inter-service dependencies creates chatty interfaces between services.
+- When data leaks out of a service, business logic almost always follows. This would lead to code duplication in terms of both models/entities and business logic resulting in low cohesion and poor encapsulation. Additionally, inter-service dependencies creates chatty interfaces between services.
 
 - The service has no dependency on other services when fulfilling a business transaction. Hence, there are no calls over the network, no hindrance due to the [fallacies of distributed systems](http://en.wikipedia.org/wiki/Fallacies_of_distributed_computing). The entire transaction is carried out in-process.
 
@@ -19,10 +21,10 @@ So, what is a service?  as Udi states it: "a service is the technical authority 
 - Since every service contains all the data it needs to service requests, services are not coupled to each other. This is crucial when building a scalable system.
 
 
-Adopting this approach means the overall system is divided into vertical slices, each representing a service. So how do services communicate?
+Adopting this approach means the overall system is divided into vertical slices, each representing a service. **So how do services communicate?** They communicate through messages. There are three types of messages, namely: event messages, command messages and document messages. Document messages simply transfer data between services but do not dictate whether what the receiver should do with the data. They usually represent business documents, say an IncidentReport. This document will contain all the information pertaining to an incident report from all the relevant services, each service will add (or fill in) the parts it knows about. For example,  
 
 ####Commands vs Events####
-Events represent things that have already happened and, therefore, cannot be undone (e.g. UserCreated). Commands are instructions to carry out an action and can be rejected (e.g. CreateUser). Command messages create coupling between services as the command instigator service knows which service can fulfil the command and what that service should do in processing a command. As bill Poole states [here](http://bill-poole.blogspot.co.uk/2008/04/avoid-command-messages.html):
+Events represent things that have already happened and, therefore, cannot be undone (e.g. UserCreated) - can ve undone through a corrective action/command, e.g. InactivateUser. Commands are instructions to carry out an action and can be rejected (e.g. CreateUser). Command messages create coupling between services as the command instigator service knows which service can fulfil the command and what that service should do in processing a command. As bill Poole states [here](http://bill-poole.blogspot.co.uk/2008/04/avoid-command-messages.html):
 
 >The fact that Service A is instructing Service B what to do means that Service A determines what shall be done, whereas Service B decides how it shall be done. This is a subtle but important form of coupling.
 
