@@ -3,7 +3,15 @@ layout: post
 title: Scalability and SOA - Part 3: UI Composition
 ---
 
+In [part 2](http://www.ashrafmageed.com/Scalability), I briefly covered Event-Driven SOA and why event messages are preferred for communication between services. I also stated that events should only contain IDs but didn't answer the question of: how can we ensure services would have the data they need to carry out their tasks when events only have IDs? This is what I will attempt to do in this post.
+
 ###UI Composition###
+UI Composition is a technique by which a user interface, or a view, is composed of more than one partial views, each served up by a service in a SOA system. It can be used when either displaying information to the user or capturing information from the user.
+
+When capturing information, composite UIs
+
+Why UI Composition?
+
 If you have not heard of the term before, then I recommend reading [this](http://www.udidahan.com/2012/06/23/ui-composition-techniques-for-correct-service-boundaries/) article by Udi Dahan.
 
 Every service would provide partial views to present the data it has. When a particular screen contains data from different services, then these partial views are mashed-up together to create one "Composite UI" view.
