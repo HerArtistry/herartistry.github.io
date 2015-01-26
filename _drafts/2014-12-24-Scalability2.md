@@ -10,7 +10,9 @@ In the [previous post](http://www.ashrafmageed.com/Scalability/) in this series,
 #### Services in Service Oriented Architecture ####
 If you are working with SOAs, then I highly recommend attending Udi Dahan's Advanced Distributed Systems Design course, or alternatively buying the recordings. 
 
-So, what is a service?  as Udi states it: "a service is the technical authority for a business capability". What does this mean? It means the UI, presentation logic, business logic and data storage for that business capability is contained within the boundaries of the service and the actual data does not leak out of the service boundaries. Why? There are numerous advantages for doing this:
+So, what is a service?  as Udi states it: "a service is the technical authority for a specific business capability". What does this mean? It means the UI, presentation logic, business logic and data storage for that business capability is contained within the boundaries of the service and the actual data does not leak out of the service boundaries. Why? There are numerous advantages for doing this:
+
+- Defining service boundaries according to business capabilities results in stable boundaries as these are unlikely to change. This reduces the risk and overhead of needing to migrate data/models/events from one service to another.
 
 - When data leaks out of a service, business logic almost always follows. This would lead to code duplication in terms of both models/entities and business logic resulting in low cohesion and poor encapsulation. Additionally, inter-service dependencies creates chatty interfaces between services.
 
@@ -21,7 +23,9 @@ So, what is a service?  as Udi states it: "a service is the technical authority 
 - Since every service contains all the data it needs to service requests, services are not coupled to each other. This is crucial when building a scalable system.
 
 
-Adopting this approach means the overall system is divided into vertical slices, each representing a service. **So how do services communicate?** Through messages. There are three types of messages, namely: event messages, command messages and document messages. 
+Adopting this approach means the overall system is divided into vertical slices, each representing a service. Defining the service boundaries, in our experience, is tricky and daunting especially at the start of the project when you do not know enough about the system and its requirements. Udi Dahan has a nice article about discovering services: [7 simple question about Service Selection](http://www.udidahan.com/2008/05/16/7-simple-questions-for-service-selection/) that we followed - I will go into details in a future post.
+
+**So how do services communicate?** Through messages. There are three types of messages, namely: event messages, command messages and document messages. 
 
 **Document messages** simply transfer data between services but do not dictate what the receiver should do with the data. They usually represent business documents, say an IncidentReport or a PurchaseOrder, and contain all the information pertaining to that document from all the relevant services, each service will act on and/or fill in the parts it knows about. As stated above, data should not leak out of the service boundaries; this immediately rules out document messages for communication between services. Moreover, there are numerous advantages in having thin messages that I will cover in a future post.
 
@@ -41,37 +45,8 @@ A system based on command messages as the form of communication will quickly bec
 This is exactly why Event messages are preferred as they eliminate this coupling. Using the above example, if Service A's activity requires service B. Then service A fires an event that service B is subscribed to. Service B then carries out its part using information stored within it when it handles that event. If another service is now needed, it simply subscribes to the event and executes its part when the event is fired.
 
 ####Event-Driven Architecture and SOA####
-As stated on this MSDN article, "Event-driven architecture is an architectural style that builds on the fundamental aspects of event notifications to facilitate immediate information dissemination and reactive business process execution." Basically, services in SOA generally communicate through events. A service fires an event describing a meaningful state change, and other interested service subscribe to such events and carry out any necessary actions required when such an event is fired. This is a very powerful architecture that allows significant scalability and decouples the services in the system as the service that fires the event does not know, and does not care, which other services are consuming this event and why. This result in low temporal and behavioural coupling.
+As stated on this MSDN article, "Event-driven architecture is an architectural style that builds on the fundamental aspects of event notifications to facilitate immediate information dissemination and reactive business process execution." Event-Driven architecture and SOA are two different and independent architectural styles. You can do any of the two without the other but combining them yields great benefits. Basically, services in Event-Driven SOA generally communicate through events. A service fires an event describing a meaningful state change, and other interested service subscribe to such events and carry out any necessary actions required when such an event is fired. This is a very powerful architecture that allows significant scalability and decouples the services in the system as the service that fires the event does not know, and does not care, which other services are consuming this event and why. This result in low temporal and behavioural coupling.
 
-**Temporal coupling** is where dependant services have to be available when a message is sent to them; while **Behavioural Coupling** is when services determine what other services should do and how. Ian Robinson wrote a wonderful article about [temporal and behavioural coupling](http://iansrobinson.com/2009/04/27/temporal-and-behavioural-coupling/) that I strongly recommend reading. He depicts temporal coupling and behavioural coupling on a matrix with event-based systems occupying the quadrant with low coupling on both and command-based systems on the low temporal coupling but high behavioural coupling. 
+**Temporal coupling** is where dependant services have to be available when a message is sent to them; while **Behavioural Coupling** is when services determine what other services should do and how. Ian Robinson wrote a wonderful article about [temporal and behavioural coupling](http://iansrobinson.com/2009/04/27/temporal-and-behavioural-coupling/) that I strongly recommend reading. He depicts temporal coupling and behavioural coupling on a matrix with event-based systems occupying the quadrant with low coupling on both and command-based systems on the low temporal coupling but high behavioural coupling.
 
-Before digging deeper it is probably worth discussing how our system looks like as well as the internals of the services.
-
-All our services are vertical slices of the system and communicate through events (low behavioural coupling) delivered by NServiceBus and MSMQ. MSMQ guarantees that messages will be delivered even when the subscriber (a service in our case) is not available (low temporal coupling). 
-
-The UI is within the boundaries of the service and, hence, is allowed to have request/response interaction with the back-end. These contain both command and query requests. Queries are processed synchronously, while commands are validated synchronously but processed asynchronously. In order to get this to work, we
- 
-- invested in ensuring valid commands are always successful, and
-- embraced eventual consistency.
-
-Invalid commands return a message to the front-end immediately and it is up to the end-user to correct/fix the command. Valid ones are passed over to NServiceBus and a success message is returned to the user.
-
-In the real world, system data changes constantly; hence, edge cases where a command may have been successful when it was validated but would violate business rules when processed sometimes appear. Some might have defined compensation actions in the business, while others might not. Take, for example, checking that username is unique when creating the user. There is a very slight chance that an identical username is created in the time between validating the CreateUser command and processing it. In order not to cause disruptions to the user, a unique human readable username placeholder is created, thus, allowing the user to use the system freely, but an e-mail is sent out to the user to correct it. This change only affects the service responsible for the username data as only IDs are allowed outside the service boundaries; limiting the ripple affect of this change. 
-
->Revisit: Therefore, the messages displayed to the user should reflect that. For example, "Request was received. Please await e-mail confirmation".
-
-NServiceBus and RavenDB were used, along with MSMQ, to ensure robustness as they all supports distributed transactions (DTC). DTCs have garnered a bad name due to their performance implications but do not get put off by that as most systems do not require the level of performance that necessitates avoiding DTC. Our requirements are strict on data loss, and, thus, DTCs and products that support it is more important for us. That was one of the reasons why we chose to use RavenDB.
-
-What happens when there is no DTC? Imagine a situation where a message is processed and the database has been updated and other events fired but an acknowledgement was not sent back to the queue because the machine crashed. When the machine is up and running, the queue will try to send the message again, which will consequently be reprocessed; leaving the system in an undesired state. This, depending on the business, can have major repercussions.
-
->Revisit: Transactions should not span service boundaries nor should they span autonomous components boundaries. This is fundamental for scalability. If you are in a situation were you need a transaction that involve more than one service, then your service boundaries are not correct and they need to be revised. Changing service boundaries is tricky when the system is in production but fairly cheap before that, hence, you need to spend appropriate time discovering your services and setting their boundaries and factoring that into your sprints, if doing agile.
-
-One alternative to DTC is to ensure messages are idempotent and prepare corrective/compensation actions for any side effects. Some messages are naturally idempotent, say MakeCustomerGoldMember,as it does not matter how many times you processes this message, the outcome is always the same. However, we are not looking at the big picture here and in real life it is rarely this simple. There is probably a complex business process that this command kick starts, for example, it could lead to a CustomerMadeGoldMember event to fire and, as we stated earlier, any other service can subscribe to this event and perform actions. Therefore, this model adds considerable complexity in terms of implementation, design, testing, business process re-modelling (for corrective/compensation actions) and maintainability.
-
-
-There are other alternatives to DTC, however, it is not something that we have looked at as we have already made the trade-off of choosing simplicity and robustness over performance and throughput. For further information about not using DTC, Jimmy Bogard has an excellent article about [ditching two phased commits](http://lostechies.com/jimmybogard/2013/05/09/ditching-two-phased-commits/) where he also links to [this](http://www.enterpriseintegrationpatterns.com/docs/IEEE_Software_Design_2PC.pdf) paper by Gregor Hohpe.
-
-
-**What to include in an event?** Events should only have IDs as data should not leak outside the service boundaries for the reasons specified at the beginning of this article. 
-
-If events only include IDs and event handlers should only use local data, then **how is the relevant data disseminated?** This is done through UI Composition and I will be covering that in the next part of this series.
+In this next post in this series, I will discuss the anatomy of a typical service in this kind of SOA.
