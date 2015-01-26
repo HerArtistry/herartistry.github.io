@@ -1,9 +1,9 @@
----
+--
 layout: post
 title: Scalability and SOA - Part 2: Event-Driven SOA
 comments: true
 tags: [SOA, Service Oriented Architecture, Scalability]
----
+--
 
 In the [previous post](http://www.ashrafmageed.com/Scalability/) in this series, I wrote about scaling up vs out, why we chose scaling out and why layered service models are not the answer. In this post, I will delve deeper into vertical services and how they help with scaling out strategies.
 
