@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Scalability and SOA - (Part 2: Event-Driven SOA)
+title: Scalability and SOA
 comments: true
 tags: [SOA, Service Oriented Architecture, Scalability]
 ---
