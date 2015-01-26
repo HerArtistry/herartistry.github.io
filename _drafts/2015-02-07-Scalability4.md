@@ -1,32 +1,36 @@
 ---
 layout: post
-title: Scalability and SOA - Part 4: UI Composition
+title: Scalability and SOA - Part 4: Anatomy of a Service
 comments: true
-tags: [SOA, Service Oriented Architecture, Scalability, UI Composition]
+tags: [SOA, Service Oriented Architecture, Scalability]
 ---
 
-In [part 2](http://www.ashrafmageed.com/Scalability), I briefly covered Event-Driven SOA and why event messages are preferred for communication between services. I also stated that events should only contain IDs but didn't answer the question of: how can we ensure services would have the data they need to carry out their tasks when events only have IDs? This is what I will attempt to do in this post.
+we have so far covered what should a service contain and how it communicates with other services but we have not discussed how the inside of a service looks like
 
-###UI Composition###
-UI Composition is a technique by which a user interface, or a view, is composed of more than one partial views, each served up by a service in a SOA system. It can be used when either displaying information to the user or capturing information from the user.
+Before digging deeper it is probably worth discussing how our system looks like as well as the internals of the services.
 
-When capturing information, composite UIs
+All our services are vertical slices of the system and communicate through events (low behavioural coupling) delivered by NServiceBus and MSMQ. MSMQ guarantees that messages will be delivered even when the subscriber (a service in our case) is not available (low temporal coupling). 
 
-Why UI Composition?
+The UI is within the boundaries of the service and, hence, is allowed to have request/response interaction with the back-end. These contain both command and query requests. Queries are processed synchronously, while commands are validated synchronously but processed asynchronously. In order to get this to work, we
+ 
+- invested in ensuring valid commands are always successful, and
+- embraced eventual consistency.
 
-If you have not heard of the term before, then I recommend reading [this](http://www.udidahan.com/2012/06/23/ui-composition-techniques-for-correct-service-boundaries/) article by Udi Dahan.
+Invalid commands return a message to the front-end immediately and it is up to the end-user to correct/fix the command. Valid ones are passed over to NServiceBus and a success message is returned to the user.
 
-Every service would provide partial views to present the data it has. When a particular screen contains data from different services, then these partial views are mashed-up together to create one "Composite UI" view.
+In the real world, system data changes constantly; hence, edge cases where a command may have been successful when it was validated but would violate business rules when processed sometimes appear. Some might have defined compensation actions in the business, while others might not. Take, for example, checking that username is unique when creating the user. There is a very slight chance that an identical username is created in the time between validating the CreateUser command and processing it. In order not to cause disruptions to the user, a unique human readable username placeholder is created, thus, allowing the user to use the system freely, but an e-mail is sent out to the user to correct it. This change only affects the service responsible for the username data as only IDs are allowed outside the service boundaries; limiting the ripple affect of this change. 
 
-In order to work effectively with event-driven SOA, the business processes are re-modelled as an asynchronous series of events. For example, a user registration process may consist of creating users, creating their log-in credentials, e-mailing the users a link to re-set their password. Traditionally, this may be presented as a wizard with a linear synchronous process where each step needs to be completed in order to move to the next step. In Event Driven SOA, the users' details and credentials are  asynchronously saved at the same time and they share the user ID. Once the user is created by the users service, a UserCreated event containing only the user ID  is fired. The credentials service, which is subscribed to this event, then uses the user ID contained in the event to retrieve the user's credentials, it then creates a reset password token (just a Guid ID) and composes the credentials' specific password reset e-mail. It then sends a command to the e-mail service to send the e-mail. The reason we can fire a UserCreated event with just an ID, is that all the user's relevant credentials information is already saved in the credentials service through the **Composite UI**.
+>Revisit: Therefore, the messages displayed to the user should reflect that. For example, "Request was received. Please await e-mail confirmation".
 
-> **Note:** You need to be judicious in your use of commands as they create coupling. More on this in a future post.
+NServiceBus and RavenDB were used, along with MSMQ, to ensure robustness as they all supports distributed transactions (DTC). DTCs have garnered a bad name due to their performance implications but do not get put off by that as most systems do not require the level of performance that necessitates avoiding DTC. Our requirements are strict on data loss, and, thus, DTCs and products that support it is more important for us. That was one of the reasons why we chose to use RavenDB.
 
-Composite UIs lead to loosely coupled services as even services that seem to collaborate in order to create one screen actually do not know about each other. Take the above users registration for example, the user service provides input fields to capture and store the users' details, while the credentials service provides similar inputs for the users' credentials.  Each view knows how to persist itself to its associated service; well, to be more precise, the view delegates this to a client-side controller/service (Note: all the client-side code lives within the service boundaries). In other words, when the users saves the form, each view sends a request to its service, which, in turn, saves the data to its data store. When the users click save, a client side event is fired and each partial view then persists itself.
+What happens when there is no DTC? Imagine a situation where a message is processed and the database has been updated and other events fired but an acknowledgement was not sent back to the queue because the machine crashed. When the machine is up and running, the queue will try to send the message again, which will consequently be reprocessed; leaving the system in an undesired state. This, depending on the business, can have major repercussions.
 
-**Client-side generated IDs:** In order to associate relevant data saved to disparate services, the ID is generated client side when you get to the composite view and then used in all services. E.g. when the end user navigated to the "Create User" screen, a new user ID is generated and used by both the users and credentials services. This way, when the user service is done persisting the user details, it fires an event containing nothing but the user ID. The credentials service can use this ID to pull up the credential information associated with that user.
+>Revisit: Transactions should not span service boundaries nor should they span autonomous components boundaries within a service. This is fundamental for scalability. If you are in a situation were you need a transaction that involve more than one service, then your service boundaries are not correct and they need to be revised. Changing service boundaries is tricky when the system is in production but fairly cheap before that, hence, you need to spend appropriate time discovering your services and setting their boundaries and factoring that into your sprints, if doing agile. There is a misconception in agile that you should not have big upfront design but that does not mean no upfront design at all.
 
-> **Note:** If the user created event is fired before the credentials service has stored the user's credentials, then you just need to retry again as it will eventually be created. This is how an eventual consistent system works and you need to cater for this. NServicebus has an exponential back-off retry feature that comes in handy in such situations.
+One alternative to DTC is to ensure messages are idempotent and prepare corrective/compensation actions for any side effects. Some messages are naturally idempotent, say MakeCustomerGoldMember,as it does not matter how many times you processes this message, the outcome is always the same. However, we are not looking at the big picture here and in real life it is rarely this simple. There is probably a complex business process that this command kick starts, for example, it could lead to a CustomerMadeGoldMember event to fire and, as we stated earlier, any other service can subscribe to this event and perform actions. Therefore, this model adds considerable complexity in terms of implementation, design, testing, business process re-modelling (for corrective/compensation actions) and maintainability.
 
->**Note:** You should not enforce referential integrity across service boundaries because it re-introduces coupling.
+
+There are other alternatives to DTC, however, it is not something that we have looked at as we have already made the trade-off of choosing simplicity and robustness over performance and throughput. For further information about not using DTC, Jimmy Bogard has an excellent article about [ditching two phased commits](http://lostechies.com/jimmybogard/2013/05/09/ditching-two-phased-commits/) where he also links to [this](http://www.enterpriseintegrationpatterns.com/docs/IEEE_Software_Design_2PC.pdf) paper by Gregor Hohpe.
+
 

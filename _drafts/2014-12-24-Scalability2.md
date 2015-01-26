@@ -7,7 +7,7 @@ tags: [SOA, Service Oriented Architecture, Scalability]
 
 In the [previous post](http://www.ashrafmageed.com/Scalability/) in this series, I wrote about scaling up vs out, why we chose scaling out and why layered service models are not the answer. In this post, I will delve deeper into vertical services and how they help with scaling out strategies.
 
-#### Services in Service Oriented Architecture ####
+#### Services in Service Oriented Architectures ####
 If you are working with SOAs, then I highly recommend attending Udi Dahan's Advanced Distributed Systems Design course, or alternatively buying the recordings. 
 
 So, what is a service?  as Udi states it: "a service is the technical authority for a specific business capability". What does this mean? It means the UI, presentation logic, business logic and data storage for that business capability is contained within the boundaries of the service and the actual data does not leak out of the service boundaries. Why? There are numerous advantages for doing this:
@@ -49,4 +49,4 @@ As stated on this MSDN article, "Event-driven architecture is an architectural s
 
 **Temporal coupling** is where dependant services have to be available when a message is sent to them; while **Behavioural Coupling** is when services determine what other services should do and how. Ian Robinson wrote a wonderful article about [temporal and behavioural coupling](http://iansrobinson.com/2009/04/27/temporal-and-behavioural-coupling/) that I strongly recommend reading. He depicts temporal coupling and behavioural coupling on a matrix with event-based systems occupying the quadrant with low coupling on both and command-based systems on the low temporal coupling but high behavioural coupling.
 
-In this next post in this series, I will discuss the anatomy of a typical service in this kind of SOA.
+So far we have established that services should communicate through events and data should not leak outside the services boundaries; so what should an event contain and how is data disseminated? This will be the topic of the next post in this series.
