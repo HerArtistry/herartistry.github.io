@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Scalability and SOA - Part 4: Anatomy of a Service
+title: Scalability and SOA - Part 4 (Anatomy of a Service)
 comments: true
 tags: [SOA, Service Oriented Architecture, Scalability]
 ---

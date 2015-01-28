@@ -1,11 +1,13 @@
 ---
 layout: post
-title: Scalability and SOA - Part 3: UI Composition
+title: Scalability and SOA - Part 3 (UI Composition)
 comments: true
 tags: [SOA, Service Oriented Architecture, Scalability, UI Composition]
 ---
 
-In [part 2](http://www.ashrafmageed.com/Scalability), I briefly covered Event-Driven SOA and why event messages are preferred for communication between services. I also stated that events should only contain IDs but didn't answer the question of: how can we ensure services would have the data they need to carry out their tasks when events only have IDs? This is what I will attempt to do in this post.
+In [part 2](http://www.ashrafmageed.com/Scalability2), I briefly covered Event-Driven SOA and why event messages are preferred for communication between services. I also stated that data should not leak out of a service boundary but didn't answer the question of: how can we ensure services would have the data they need to carry out their tasks when all data is local? This is what I will attempt to do in this post.
+
+**Only operate on local data**
 
 ###UI Composition###
 UI Composition is a technique by which a user interface, or a view, is composed of more than one partial views, each served up by a service in a SOA system. It can be used when either displaying information to the user or capturing information from the user.
