@@ -10,6 +10,7 @@ IOC containers are a great way to manage dependencies and their lifetimes. They 
 I used to be a big fan of IOC containers and constantly utilised them to inject any dependency I had but recently I have come to use them cautiously. There are various reasons why I started doing this and they are not all due to IOC containers themselves. 
 
 ###Issues Related to IOC Containers###
+
 ####Magic####
 I was constantly fighting against our IOC container and spending countless hours debugging and resolving issues caused by it. Granted, I did not spend enough time learning that particular IOC container I inherited but that is exactly the point. IOC containers introduce a fair bit of magic, as Greg Young calls it, and you can no longer expect developers to just hit the ground running (especially when you are hiring Graduates/Junior level developers). This could be said about most tools but IOC containers represent a bigger risk because they affect the whole project and are often abused.
 
