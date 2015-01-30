@@ -5,8 +5,6 @@ comments: true
 tags: [IOC, Containers, Dependency Injection, Inversion of Control]
 ---
 
-{% include _toc.html %}
-
 IOC containers are a great way to manage dependencies and their lifetimes. They have concise, fluent syntax and help keep all dependency configurations neatly confined to the composition root and greatly simplify/eliminate writing code to handle lifetime management. Some even allow you to specify a convention and they scan the assemblies for you and automatically create the dependency graph. What's not to love about them?
 
 I used to be a big fan of IOC containers and constantly utilised them to inject any dependency I had but recently I have come to use them cautiously. There are various reasons why I started doing this and they are not all due to IOC containers themselves. 
