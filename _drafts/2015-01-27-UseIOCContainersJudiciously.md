@@ -29,9 +29,9 @@ I, also, changed how I do unit tests and this affected my need for IOC. I used t
     components, however, are not dependencies, they are internal implementation details.
 
 ####Avoid Speculative Generality####
-For something to be abstracted as a dependency (not an internal component), it must be duplicated in at least two - or more - separate areas of the application. This way we have already proven that it will be reused.
+For something to be abstracted, it must be duplicated in at least two - or more - separate areas of the application. This way we have already proven that it will be reused.
 
-Premature generalization adds extra complexity without immediate, or guaranteed ROI, as Jason Gorman states on [this](http://codemanship.co.uk/parlezuml/blog/?postid=934) post about RAP:
+Premature generalization adds extra complexity without immediate, or guaranteed ROI and is one of the reasons why we end up with complicated and convoluted object graphs. Jason Gorman states in [this](http://codemanship.co.uk/parlezuml/blog/?postid=934) post about RAP:
 
 >Writing code on the basis that it may be applicable in multiple future scenarios is speculation, and speculative generality is considered a code smell. The danger is that when the future comes, the reusable generalisation we planned turns out to be not quite what is actually needed, or doesn't quite fit all the scenarios, or - more usually - that the future eventuality never comes up.
 
@@ -39,11 +39,9 @@ Premature generalization adds extra complexity without immediate, or guaranteed 
 I love simplicity; this is why often, dare I say it, I just do [JFHCI](http://ayende.com/blog/3545/enabling-change-by-hard-coding-everything-the-smart-way). I do not abstract away my database behind an IRepository and generally try to limit my abstractions. This leads to the avoidance of deep compositional graphs and improves simplicity as you reduce the levels of indirection, as stated by [David Wheeler](http://goo.gl/1gYGpU):
 
 >"All problems in computer science can be solved by another level of indirection, except of course for the problem of too many indirections."
->
-####Find and Abstract Concepts####
 ###Conclusion###
  
-This does not mean I have stopped using IOC containers, I have just started using it judiciously - as the title suggests - and stopped using it as an alternative to simple good object oriented design. I could try to explain where I use it and why but I reckon I won't be able to do it as well as Jimmy Bogard:
+This does not mean I have stopped using IOC containers, I have just started using it judiciously - as the title suggests - and stopped using it as an alternative to simple good object oriented design. There is no over-reliance on IOC containers and they do not drive, or influence, my implementation or design decisions. Jimmy Bogard summarises this very well:
 
 >Ultimately, successful container usage comes down to proper OO, limiting abstractions and focusing on concepts. Composition can be achieved in many forms – often supported directly in the language, such as pattern matching or mixins – but no language has it perfect so being able to still rely on dependency injection without a lot of fuss can be extremely powerful.
 
