@@ -27,7 +27,8 @@ IOC containers tend to drive developers to violate the [Reused Abstractions Prin
 ####TDD - No Mocking
 I used to be a Mockist, testing every class/method in complete isolation. This meant that I had a lot if abstractions in order to facilitate this kind of unit testing. These abstractions all needed to be managed, therefore, I had deep object graphs and most of my implementations suffered from construction over-injection. In order to resolve these, I ended up with more higher level (aggregate) abstractions that only deepened my object graphs. But all these levels of indirection were only needed to allow me to isolate the classes so I can test them separately, which DHH termed [Test-Induced Design Damage](http://david.heinemeierhansson.com/2014/test-induced-design-damage.html) in the "Is TDD Dead?" debate. I hardly use mocks now and tend to write higher level tests (more on that in a future post). This means I no longer have the same number of abstractions, hence, less dependencies to manage.
 
-Note: When testing this way you end up with less dependencies. It does not mean everything is now in a single class as code is still component-ized and conforms to SRP. These components, however, are not dependencies, they are internal implementation details.|
+Note: When testing this way you end up with less dependencies. It does not mean everything is now in a single class as code is still component-ized and conforms to SRP. These components, however, are not dependencies, they are internal implementation details.             |
+----------------------- |
 
 ####Avoid Speculative Generality####
 For something to be abstracted (excluding things that we don't have control over), it must be duplicated in at least two, or more, separate areas of the application. This way we have already proven that it will be reused.
