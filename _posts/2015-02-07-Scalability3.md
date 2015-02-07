@@ -29,7 +29,8 @@ UI Composition disseminates the data to the services without creating any coupli
 
 **Client-side generated IDs:** In order to associate relevant data saved to disparate services, a shared ID is generated client side when you navigate to the composite view and then used alongside the data persisted in each service. For example, in figure 1 above, a user ID will be generated when you get to this view, and the data persisted in services A, B and C will include this user ID; linking the information captured from the user. This ID is all the services need to identify
 
-#### Possible Concerns
+####Possible Concerns
+
 #####Performance
 if performance is a concern, then you can use [client-side IT/Ops](http://www.udidahan.com/2014/07/30/service-oriented-composition-with-video/) as explained by Udi Dahan. This reduces the number of calls between the client and the server but requires a bit more code in both.
 
