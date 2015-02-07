@@ -13,7 +13,7 @@ In order to ensure services are autonomous, they should only operate on local da
 ###Only Share IDs
 As stated in part 2, data should not leak outside the service boundaries and service communicate through events. So what does an event contain? IDs only. This has numerous benefits:
 
-- **No logical coupling:** the event messages are responsible for information from multiple services
+- **No logical coupling:** the event messages are not responsible for information from multiple services
 - **Easier versioning:** there are no data structures to version or manage, therefore, eliminating the risk of breaking this contract between services.
 - **Easier testing:** just as above, there are no data structure or information to test. We only ever just need to test that the event has the correct IDs.
 - **No data leaks:** as explained in part 2.
