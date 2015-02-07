@@ -27,13 +27,17 @@ UI Composition is a technique by which a user interface, or a view, is composed 
 
 UI Composition disseminates the data to the services without creating any coupling among them as they are not aware of each other. This is achieved by encapsulating the knowledge of where to send/get the data to/from as part of the client side code of the partial view. For example, in the above figure, each service would have a JavaScript controller associated with it. This controller knows how to fetch/save the data contained in its corresponding view. Lets imagine the same form allowed capturing data, once user enters all the data and presses save, an event is fired and each controller handles that event and persists the data entered in the fields associated with it. This means, there will be 3 server calls to persist the data associated with service A, B and C. If this is raising alarm bells in your head, bear with me as I will, hopefully, address them shortly.
 
-**Client-side generated IDs:** In order to associate relevant data saved to disparate services, a shared ID is generated client side when you navigate to the composite view and then used alongside the data persisted in each service. For example, in figure 1 above, a user ID will be generated when you get to this view, and the data persisted in services A, B and C will include this user ID; linking the information captured from the user. 
+**Client-side generated IDs:** In order to associate relevant data saved to disparate services, a shared ID is generated client side when you navigate to the composite view and then used alongside the data persisted in each service. For example, in figure 1 above, a user ID will be generated when you get to this view, and the data persisted in services A, B and C will include this user ID; linking the information captured from the user. This ID is all the services need to identify
 
 #### Concerns
 #####Performance
-#####Client-Side ID Generation
-#####Error Management
+if performance is a concern, then you can use [client-side IT/Ops](http://www.udidahan.com/2014/07/30/service-oriented-composition-with-video/) as explained by Udi Dahan. This reduces the number of calls between the client and the server but requires a bit more code in both the client and the server.
 
+#####Client-Side ID Generation
+As developers, we are not used to generate client-side IDs and it might sound counter-intuitive to do so, however, this is crucial when following this kind of event-driven SOA. There are numerous JavaScript libraries that generate unique Guids. If, for whatever reason, you are not comfortable doing this client side, you can always create a simple service that - when called - just returns a unique GUID from the server.
+
+#####Error Management
+What happens when a 
 Each section of
 When capturing information, composite UIs
 
