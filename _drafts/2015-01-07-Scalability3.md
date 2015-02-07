@@ -34,7 +34,9 @@ UI Composition disseminates the data to the services without creating any coupli
 if performance is a concern, then you can use [client-side IT/Ops](http://www.udidahan.com/2014/07/30/service-oriented-composition-with-video/) as explained by Udi Dahan. This reduces the number of calls between the client and the server but requires a bit more code in both.
 
 #####Client-Side ID Generation
-As developers, we are not used to generate client-side IDs and it might sound counter-intuitive to do so, however, this is crucial when following this kind of event-driven SOA. There are numerous JavaScript libraries that generate unique Guids. If, for whatever reason, you are not comfortable doing this client side, you can always create a simple service that - when called - just returns a unique GUID from the server.
+As developers, we are not used to generating client-side IDs and it might sound counter-intuitive to do so, however, this is crucial when following this kind of event-driven SOA. These IDs are the glue that connects the pieces of data saved into all those independent services. 
+
+There are numerous JavaScript libraries that generate unique GUIDs; however, If, for whatever reason, you are not comfortable doing this client side, you can always create a simple service that - when called - just returns a unique GUID from the server.
 
 #####Error Management
 What happens when the composite UI consists of multiple server calls that all pass apart from one? The commands are not handled synchronously and if they pass validation they are assumed successful. In other words, we only validate the commands and return. If any of the commands fail validation, we display an error message to the end user. Otherwise, a success message is displayed as valid commands should almost always be processed successfully and compensating actions are defined to deal with failures. I will go into more details in a future post.
