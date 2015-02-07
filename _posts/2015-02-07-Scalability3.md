@@ -2,7 +2,7 @@
 layout: post
 title: Scalability and SOA - Part 3 (UI Composition)
 comments: true
-tags: [SOA, Service Oriented Architecture, Scalability, UI Composition]
+tags: [SOA, Service Oriented Architecture, Scalability, UI Composition, Coupling]
 ---
 
 In [part 2](http://www.ashrafmageed.com/Scalability2), I briefly covered Event-Driven SOA and why event messages are preferred for communication between services. I also stated that data should not leak out of a service boundary but didn't answer the question of: how can we ensure services would have the data they need to carry out their tasks? This is what I will attempt to do in this post.
