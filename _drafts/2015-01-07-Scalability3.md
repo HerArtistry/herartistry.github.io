@@ -37,7 +37,7 @@ if performance is a concern, then you can use [client-side IT/Ops](http://www.ud
 As developers, we are not used to generate client-side IDs and it might sound counter-intuitive to do so, however, this is crucial when following this kind of event-driven SOA. There are numerous JavaScript libraries that generate unique Guids. If, for whatever reason, you are not comfortable doing this client side, you can always create a simple service that - when called - just returns a unique GUID from the server.
 
 #####Error Management
-What happens when a 
+What happens when the composite UI consists of multiple servers that all pass apart from one? The commands are not hadled synchronously and if they pass validation they are assumed successful. In other words, we only validate that the  In a future post, I will explain how we 
 Each section of
 When capturing information, composite UIs
 
