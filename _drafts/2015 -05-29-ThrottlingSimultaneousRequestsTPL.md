@@ -13,8 +13,31 @@ The await keyword allows you to execute a piece of code asynchronously and it fr
 
 In order to achieve this, we need a gateway that keeps track of the number of requests, queues them up and throttles them according to the maximum number allowed. This gateway wraps the call to the regulated API and has a static Dataflow Block that requests are posted to. This block is static, and therefore shared by all consumers of the gateway. When a request for the regulated api is received, this is posted to the queue and awaited as shown below:
 
-'''
- var task = Task.Run(() => /* code that call the regulated API*/);
- CalibrationBlock.Post(task.FromDerived<BasePricingResponse, TResp>());
- return (TResp) await CalibrationBlock.ReceiveAsync();
- '''
+    var task = Task.Run(() => /* code that call the regulated API*/);
+    CalibrationBlock.Post(task);
+    return await CalibrationBlock.ReceiveAsync();
+
+One problem I encountered was dealing with the generic return type of the regulated API. The static block should handle all return types as we need to regulate all request - not group them by return type. Hence, the Task<DerivedType> should be stored as Task<BaseType>. I found the easiest way to do this is by using the below extension method, which I found in [this](http://stackoverflow.com/a/15530315/2962640) StackOverflow answer:
+
+    public static Task<TBase> FromDerived<TBase, TDerived>(this Task<TDerived> task) where TDerived : TBase
+    {
+            var baseTypeTask = new TaskCompletionSource<TBase>();
+
+            task.ContinueWith(derivedTask => baseTypeTask.SetResult(derivedTask.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+            task.ContinueWith(derivedTask => baseTypeTask.SetException(derivedTask.Exception.InnerExceptions), TaskContinuationOptions.OnlyOnFaulted);
+            task.ContinueWith(derivedTask => baseTypeTask.SetCanceled(), TaskContinuationOptions.OnlyOnCanceled);
+
+            return baseTypeTask.Task;
+    }
+
+So queuing up the task now becomes:
+
+    var task = Task.Run(() => /* code that call the regulated API*/);
+    CalibrationBlock.Post(task.FromDerived<BaseResponse, TResponse>());
+    return (TResponse) await CalibrationBlock.ReceiveAsync();
+
+But how do we ensure we adhere to the allowed number of simultaneous requests? Well, the Transform Block has an options to set that when it is initialized:
+
+    new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = MaxAllowedNumberOfSimultaneousRequests }
+
+This will allows tasks to be queued up whlst only executing the maximum allowed sumltaneous ones at a time, fetching more from the queue whenever a task is complete. However, the transform block 
