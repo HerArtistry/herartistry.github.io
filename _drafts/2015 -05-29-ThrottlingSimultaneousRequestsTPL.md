@@ -40,4 +40,95 @@ But how do we ensure we adhere to the allowed number of simultaneous requests? W
 
     new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = MaxAllowedNumberOfSimultaneousRequests }
 
-This will allows tasks to be queued up whlst only executing the maximum allowed sumltaneous ones at a time, fetching more from the queue whenever a task is complete. However, the transform block 
+This will allows tasks to be queued up whlst only executing the maximum allowed simultaneous ones at a time, executing more from the queue whenever a task is complete. However, the transform block returns results in the order they were added as shown in the example below:
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            TestMain();
+            Console.ReadLine();
+        }
+
+        public class TaskInfo
+        {
+            public TaskInfo(string name, int delay)
+            {
+                Name = name;
+                Delay = delay;
+            }
+            public string Name;
+            public int Delay;
+        }
+
+        public class TestClass
+        {
+            private static readonly TransformBlock<TaskInfo, string> Downloader;
+
+            static TestClass()
+            {
+                Downloader = new TransformBlock<TaskInfo, string>(
+               taskInfo => CreateTask(taskInfo),
+               new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 2 }
+               );
+            }
+
+            public async Task<string> Calibrate(TaskInfo taskInfo)
+            {
+                Downloader.Post(taskInfo);
+                return await Downloader.ReceiveAsync();
+            }
+        }
+
+        private static async void TestMain()
+        {
+            _tasks = new List<Task<string>>();
+
+            var t1 = new TestClass().Calibrate(new TaskInfo("test1", 10000));
+            var t2 = new TestClass().Calibrate(new TaskInfo("test2", 2000));
+            var t3 = new TestClass().Calibrate(new TaskInfo("test3", 2000));
+            var t4 = new TestClass().Calibrate(new TaskInfo("test4", 2000));
+
+            _tasks.Add(t1);
+            _tasks.Add(t2);
+            _tasks.Add(t3);
+            _tasks.Add(t4);
+
+            while (_tasks.Count > 0)
+            {
+                var firstTask = await Task.WhenAny(_tasks);
+                _tasks.Remove(firstTask);
+
+                var t = await firstTask;
+                Console.WriteLine(t);
+            }
+        }
+
+        private static List<Task<string>> _tasks;
+
+        private static async Task<string> CreateTask(TaskInfo info)
+        {
+            Console.WriteLine("** Started processing: {0}", info.Name);
+            
+            await Task.Delay(info.Delay);
+            
+            Console.WriteLine("%% Completed processing: {0}", info.Name);
+            
+            return string.Format("Returned awaitable value from: {0}", info.Name);
+        }
+    }    
+        
+        // Output:
+        //** Started processing: test1
+        //** Started processing: test2
+        //%% Completed processing: test2
+        //** Started processing: test3
+        //%% Completed processing: test3
+        //** Started processing: test4
+        //%% Completed processing: test4 
+        //%% Completed processing: test1 
+        //Returned awaitable value from: test1 
+        //Returned awaitable value from: test2 
+        //Returned awaitable value from: test3 
+        //Returned awaitable value from: test4
+
