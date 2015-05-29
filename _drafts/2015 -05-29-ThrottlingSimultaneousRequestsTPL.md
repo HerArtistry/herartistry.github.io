@@ -132,3 +132,75 @@ This will allows tasks to be queued up whlst only executing the maximum allowed 
         //Returned awaitable value from: test3 
         //Returned awaitable value from: test4
 
+The maximum degree of parallelism is set to 2, therefore, tasks 1 and 2 are processed in parallel. Since task 1 takes a long time, only one extra task is processed; hence, keeping within the maximum allowed simultaneous requests. However, although tasks 2,3 and 4 are done, they are not processed as the Transform Block is waiting for task 1 to finish. This is confirmed by the documentation:
+
+>When you specify a maximum degree of parallelism that is larger than 1, multiple messages are processed simultaneously, and therefore, messages might not be processed in the order in which they are received. The order in which the messages are output from the block will, however, be correctly ordered.
+
+Thankfully, this can be fixed by creating a custom dataflow block as shown in [this](http://stackoverflow.com/a/22894184/2962640) Stackoverflow answer. Once we add this to our test code by replacng the test class with this
+
+    public class TestClass
+    {
+            private static readonly IPropagatorBlock<TaskInfo, string> Downloader;
+
+            static TestClass()
+            {
+                Downloader = CreateUnorderedTransformBlock<TaskInfo, string>(
+                taskInfo => CreateTask(taskInfo),
+                new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 2 }
+                );
+            }
+
+            public async Task<string> Calibrate(TaskInfo taskInfo)
+            {
+                Downloader.Post(taskInfo);
+                return await Downloader.ReceiveAsync();
+            }
+        }
+
+        public static IPropagatorBlock<TInput, TOutput> CreateUnorderedTransformBlock<TInput, TOutput>(Func<TInput, Task<TOutput>> func, ExecutionDataflowBlockOptions options)
+        {
+            var buffer = new BufferBlock<TOutput>(options);
+            var action = new ActionBlock<TInput>(
+                async input =>
+                {
+                    var output = func(input);
+                    await buffer.SendAsync(await output);
+                }, options);
+
+            action.Completion.ContinueWith(
+                t =>
+                {
+                    IDataflowBlock castedBuffer = buffer;
+
+                    if (t.IsFaulted)
+                    {
+                        castedBuffer.Fault(t.Exception);
+                    }
+                    else if (t.IsCanceled)
+                    {
+                        // do nothing: both blocks share options,
+                        // which means they also share CancellationToken
+                    }
+                    else
+                    {
+                        castedBuffer.Complete();
+                    }
+                });
+
+            return DataflowBlock.Encapsulate(action, buffer);
+        }
+
+Running the same code again produces the following output:
+
+    ** Started processing: test1
+    ** Started processing: test2
+    %% Completed processing: test2
+    ** Started processing: test3
+    Returned awaitable value from: test2
+    %% Completed processing: test3
+    Returned awaitable value from: test3
+    ** Started processing: test4
+    %% Completed processing: test4
+    Returned awaitable value from: test4
+    %% Completed processing: test1
+    Returned awaitable value from: test1
