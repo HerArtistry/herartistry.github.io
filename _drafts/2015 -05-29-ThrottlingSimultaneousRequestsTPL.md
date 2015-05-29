@@ -196,9 +196,9 @@ Running the same code again produces the following output:
     ** Started processing: test2
     %% Completed processing: test2
     ** Started processing: test3
-    Returned awaitable value from: test2
+    Returned awaitable value from: test2 // returned as soon as method was completed
     %% Completed processing: test3
-    Returned awaitable value from: test3
+    Returned awaitable value from: test3 // returned as soon as method was completed
     ** Started processing: test4
     %% Completed processing: test4
     Returned awaitable value from: test4
