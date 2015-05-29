@@ -32,11 +32,22 @@ CQS further improves predictability by guaranteeing that query methods are idemp
 
 **Avoid Aspect Oriented Programming**
 
-Aspect Oriented Programming (AOP) violates the Principle of Least Astonishment (POLA). It makes it extremely difficult to predict what a piece of code is going to do and is deceives you into thinking that your code is simple and straight forward when most of time it is not.
+Aspect Oriented Programming (AOP) violates the Principle of Least Astonishment (POLA). It makes it extremely difficult to predict what a piece of code is going to do and it deceives you into thinking that your code is simple and straight forward.
 
-**Do not return nulls**
+**Do not return nulls** This is a quick draft
+Tony Hoare decribed it as his "billion dollar mistake" but what is really wrong with nulls and how is this releated to predictability? In object oriented programming, null is a time bomb that catches you by surprise unexpectedly. This is because any any refrence type can in theory be null and it can therefore blow up on your face if you do not account for it. Take for example this code:
 
- 
+    var order = mediator.Execute(getOrderQuery(23));
+
+what is the value of order? Well, it is either an order object or null; hence, you would have to check for nulls before continuing the code
+
+    if(order != null)
+    {
+        // process order
+    }
+
+But this could have easily been missed and it's further amplified when you get an order that has, for example, order details. Now the order is not null but it's details could be. This hurts predictability as in an ideal world when I fetch an order I expect to either get an order or not and this can be represented better using an Option or Maybe types because when you know you're getting back a Maybe you can safely predict that the returned types is either there or not.
+
 PRINCIPLE OF LEAST ASTONISHMENT
 
 Not returning NULLs and not throwing exceptions.
