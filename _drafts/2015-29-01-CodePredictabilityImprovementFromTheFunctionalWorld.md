@@ -5,7 +5,7 @@ comments: true
 tags: [C#, functional programming]
 ---
 
-various guidelines, books and blog posts about clean code and readability but there is hardly any guidance on predictability. There are code predictability signs that overlap with readability but predictability goes beyond whether a method or property has a self-explanatory name. To me predictability for methods/properties include:
+Various guidelines, books and blog posts talk about clean code, readability and maintainability but there is hardly any guidance on predictability. There are code predictability signs that overlap with readability but predictability goes beyond whether a method or property has a self-explanatory name. To me predictability for methods/properties include:
 no hidden side effects
 no nulls returned
 no exceptions thrown
@@ -23,7 +23,7 @@ what does this code actually do? Can you predict that without inspecting the met
     	//returns the number of available tables
     }
 
-Would have been able to predict that by just looking at the method signature? How about now:
+Would you have been able to predict that by just looking at the method signature? How about now:
 
     public void ReserveTable();
     public int GetNumberOfAvailableTables();
@@ -32,7 +32,7 @@ CQS further improves predictability by guaranteeing that query methods are idemp
 
 **Avoid Aspect Oriented Programming**
 
-Aspect Oriented Programming (AOP) violates the Principle of Least Astonishment (POLA). It makes it extremely difficult to predict what a piece of code is going to do and it deceives you into thinking that your code is simple and straight forward.
+Aspect Oriented Programming (AOP) violates the Principle of Least Astonishment (POLA). It makes it extremely difficult to predict what a piece of code is going to do and it deceives you into thinking that your code is simple and straight forward when it is not. Some AOP frameworks require the use of attributes which slightly improves predictability and are easier to discover than ones that do not. What problem do AOP framewoks actually solve? and is there a way to not have that problem in the first place? 
 
 **Do not return nulls** This is a quick draft
 Tony Hoare decribed it as his "billion dollar mistake" but what is really wrong with nulls and how is this releated to predictability? In object oriented programming, null is a time bomb that catches you by surprise unexpectedly. This is because any any refrence type can in theory be null and it can therefore blow up on your face if you do not account for it. Take for example this code:
