@@ -204,3 +204,37 @@ Running the same code again produces the following output:
     Returned awaitable value from: test4
     %% Completed processing: test1
     Returned awaitable value from: test1
+
+If any of the tasks in the TransformBlock throw an exception, the bloack will neither process the pending tasks nor accept any new ones. In order to prevent this, the transformation function should no throw exceptions but rather catch them and return them as part of the result. Hence, this code:
+
+     Downloader = CreateUnorderedTransformBlock<TaskInfo, string>(
+                taskInfo => CreateTask(taskInfo), // this is the transformation function
+                new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 2 }
+     );
+
+Should become:
+
+     Downloader = CreateUnorderedTransformBlock<TaskInfo, TransformResult<string>>(
+                    async taskInfo =>
+                    {
+                        try
+                        {
+
+                            var result = await CreateTask(taskInfo);
+                            return new TransformResult<string> {Result = result};
+                        }
+                        catch (AggregateException ae)
+                        {
+
+                            return new TransformResult<string> {Error = ExceptionDispatchInfo.Capture(ae.InnerException)};
+                        }
+
+                    },
+                new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 2 }
+        );
+        
+        public class TransformResult<T>
+        {
+            public T Result { get; set; }
+            public ExceptionDispatchInfo Error { get; set; }
+        }
