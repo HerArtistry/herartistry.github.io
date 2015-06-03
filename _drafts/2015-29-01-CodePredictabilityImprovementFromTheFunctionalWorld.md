@@ -48,6 +48,8 @@ what is the value of order? Well, it is either an order object or null; hence, y
 
 But this could have easily been missed and it's further amplified when you get an order that has, for example, order details. Now the order is not null but it's details could be. This hurts predictability as in an ideal world when I fetch an order I expect to either get an order or not and this can be represented better using an Option or Maybe types because when you know you're getting back a Maybe you can safely predict that the returned types is either there or not.
 
+Some functional languages do not allow you to throw exceptions but rather return an object that has an exception/error property.
+
 PRINCIPLE OF LEAST ASTONISHMENT
 
 Not returning NULLs and not throwing exceptions.
