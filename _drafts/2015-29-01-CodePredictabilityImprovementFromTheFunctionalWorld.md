@@ -57,12 +57,9 @@ Initialising values in a valid state
 
 This draft does not emphasise the lessons learned from functional programming, It only talks about how to improve predictability. I need to cover these points and show how they can be implemented in, for example, C#:
 
-Variables should not be allowed to change their type.
-Objects containing the same values should be equal by default.
-Comparing objects of different types is a compile-time error.
 Objects must always be initialized to a valid state. Not doing so is a compile-time error.
 Once created, objects and collections must be immutable.
 No nulls allowed.
 Missing data or errors must be made explicit in the function signature.
 
-NOte: this is a copy from the excellent [Is your programming language unreasonable?](http://fsharpforfunandprofit.com/posts/is-your-language-unreasonable/) article.
+Note: this is a copy from the excellent [Is your programming language unreasonable?](http://fsharpforfunandprofit.com/posts/is-your-language-unreasonable/) article.
