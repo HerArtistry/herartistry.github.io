@@ -291,3 +291,32 @@ The ideal solutions would be to return tasks as they are completed but somehow m
                     return await block.ReceiveAsync();
                 }
             }
+
+Now we need to replace the code that calls the ReceiveAsync on the static unordered TransformBlock with a call to the above method, passing in the identifier (task name):
+
+                Downloader.Post(taskInfo);
+
+                var outcome = await ReceiveAsync(taskInfo.Name);
+
+                if (outcome.Error != null)
+                    return "an error has occured in " + taskInfo.Name;
+
+                return outcome.Result;
+
+The output after making the above changes is:
+
+    ** Started processing: test1
+    ** Started processing: test2
+    %% Completed processing: test2
+    ** Started processing: test3
+    Returned awaitable value from: test2 *** t2 - took: 00:00:02.0095554
+    %% Completed processing: test3
+    ** Started processing: test4
+    Returned awaitable value from: test3 *** t3 - took: 00:00:03.9181103
+    %% Completed processing: test4
+    Returned awaitable value from: test4 *** t4 - took: 00:00:05.8321348
+    %% Completed processing: test1
+    Returned awaitable value from: test1 *** t1 - took: 00:00:10.0315769
+    All Done. Total time taken is 15 seconds
+
+As can be seen above, the outputs are matched to the correct tasks and there's a significant improvement in terms of time taken when compared with the TransformBlock.
