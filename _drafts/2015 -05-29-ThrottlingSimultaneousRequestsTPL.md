@@ -238,3 +238,56 @@ Should become:
             public T Result { get; set; }
             public ExceptionDispatchInfo Error { get; set; }
         }
+
+It might not be immediately obvious but there is big problem with the above code. The problem appears when we try to track which task received which output by spitting out the task name from both the proessed task and the awaiting task. The output in this case is:
+
+    ** Started processing: test1
+    ** Started processing: test2
+    %% Completed processing: test2
+    ** Started processing: test3
+    Returned awaitable value from: test2 *** t1 - took: 00:00:02.1086100 // t1 was waitng for test1 not test2
+    %% Completed processing: test3
+    ** Started processing: test4
+    Returned awaitable value from: test3 *** t2 - took: 00:00:04.0231902 // t2 was waiting for test2 not test3
+    %% Completed processing: test4
+    Returned awaitable value from: test4 *** t3 - took: 00:00:05.9262377
+    %% Completed processing: test1
+    Returned awaitable value from: test1 *** t4 - took: 00:00:09.72 //t4 was waiting for test4 but got the output of test1
+    All Done. Total time taken is 11 seconds
+
+Notice how task t1 received the output from test2 instead of test1 and t2 from test3 and t3 from test4 and t4 from test1. Not a single task got the outcome it was waiting for. This is because we are no longer maintaining the order of the tasks in the TransformBlock, however, ReceiveAsync still respects that order and first ReceiveAsync called will get the first result. In the above example, t1 invoked the ReceiveAsync first but since t1's task takes longer than t2's, t2 will finish first and t1 will get the output from t2's. This has a knock on effect and each task will then receive the next task's output instead of its own.
+
+How can this be fixed? Well, one way is to reuse the TransformBlock instead. This maintains the ordering, thus, ensuring the correct tasks are returned.
+
+    ** Started processing: test1
+    ** Started processing: test2
+    %% Completed processing: test2
+    ** Started processing: test3
+    %% Completed processing: test3
+    ** Started processing: test4
+    %% Completed processing: test4
+    %% Completed processing: test1
+    Returned awaitable value from: test1 *** t1 - took: 00:00:10.0334752
+    Returned awaitable value from: test3 *** t3 - took: 00:00:09.8336984
+    Returned awaitable value from: test2 *** t2 - took: 00:00:09.9426121
+    Returned awaitable value from: test4 *** t4 - took: 00:00:09.7355575
+    All Done. Total time taken is 28 seconds
+
+**************************** Re-write this draft
+This solution fixed the problem and we can stop here and call it a day. However, this is still not an acceptable solution. First notice the time it now takes to complete the tasks. It has almost tripled from 11 seconds to 28 seconds. This is because the TransformBlock is waiting for the first task to finish before returning the result and since the first task is the longest, all the other tasks are queued up and waiting for it to finish. This is detrimental to performance as requests through this gateway will be affected by unrelated request; thus, long running requests will affect all other requests in the pipeline.
+************************************
+
+The ideal solutions would be to return tasks as they are completed but somehow map them to the correct consumer. Dataflow allows you to link blocks together and this is what we are going to use. Instead of all consumers awaiting for tasks on the same output queue, we can create a queue for every consumer. This way we can ensure that the correct consumers get the correct output without having to rely on the order. The 'LinkTo' method in the IPropagatorBlock allows configuring a perdicate that is used to filter the message to pass on to the linked block. We can use any identifier as long as it is always there so that we can deal with routing exceptions as well.
+
+    async Task<TransformResult<string>> ReceiveAsync(string identifier)
+            {
+                var block = new BufferBlock<TransformResult<string>>();
+
+                using (Downloader.LinkTo(
+                    block, 
+                    new DataflowLinkOptions {MaxMessages = 1, PropagateCompletion = true}, 
+                    output => output.Id == identifier)) // this is the predicate used for filtering
+                {
+                    return await block.ReceiveAsync();
+                }
+            }
