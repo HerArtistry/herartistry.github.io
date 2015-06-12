@@ -15,11 +15,21 @@ As Udi Dahan stated [here](), the only difference between a Microservice and an 
 
 #### Testing
 - No unit tests
+following this style of architecture, we have found that unit tests do not add a lot of value. The ACs are independent, small and have a single responsibility. Additionally, since the system is divided into numerous vertical services, the number of tests per services are fairly small and could be covered by integration tests alone without worrying that tests would take too long to run.
+
 - Integration and Smoke tests only
 
 #### Dependency Management 
 - No IOC 
+Autonomous components do not depend on each other and are not expected to be modified. If an AC needs to change, it is simply replaced by a new AC - you can think of this as applying the Open/Close principle to service, in a way.
+
+This does not mean there are no shared dependencies at all but they are so few that a full blown IOC container is more than an overkill. So, how to manage those dependencies? Well, there are a few options but the main one is to just hardcode them as Ayende Rahien states [here](add link). This might seem totally wrong but in this style of architecture, dependencies are few and fairly stable coupled with a small ripple affect - as explained in the DRY section below. Another way to manage dependencies is by using partial functions.
+
 - partial functions (examples in a future post)
+I first came across this in the excellent [8 lines of code presentation](add link) by Greg Young. Basically, you create a unified interface between your implementations and use closures to wrap your dependecies in the composition root. You can easily configure life management of your dependencies and inject the composed object into your applicable seams, e.g. IDependencyResolver? for Web Api. In a future post, I will describe this in more details and show code examples.
+
+#### DRY (Don't Repeat Yourself)
+We all know the benefits of DRY, so I am not going to repeat them here, but in a SOA implementations DRY should be exhibited within the service boundaries only. This is because we go to great lengths to ensure that services are not coupled together and that the ripple effect of change is minimal; hence, re-using and sharing the same components risks undoing all this work. Besides, most of the time, these services grow to do things differently and the once identical functionalites might not be so after all. In my experience, if the .... talk about stable shared code and ok to copy n paste....
 
 Before digging deeper it is probably worth discussing how our system looks like as well as the internals of the services.
 
