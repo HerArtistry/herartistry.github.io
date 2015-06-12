@@ -5,7 +5,9 @@ comments: true
 tags: [SOA, Service Oriented Architecture, Scalability]
 ---
 
-we have so far covered what should a service contain and how it communicates with other services but we have not discussed how the inside of a service looks like
+we have so far covered what should a service contain and how it communicates with other services but we have not discussed how the anatomy of a service. This is what I hope to cover in this post.
+
+As stated in previous parts of this series, a service is a vertical slice through the system and it is the technical authority for a specific business capability; therefore, a service is 
 
 Before digging deeper it is probably worth discussing how our system looks like as well as the internals of the services.
 
