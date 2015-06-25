@@ -5,13 +5,15 @@ comments: true
 tags: [SOA, Service Oriented Architecture, Scalability]
 ---
 
-we have so far covered what should a service contain and how it communicates with other services but we have not discussed how the anatomy of a service. This is what I hope to cover in this post.
+we have so far covered what should a service contain and how it communicates with other services but we have not discussed the anatomy of a service. This is what I hope to cover in this post.
 
 As stated in previous parts of this series, a service is a vertical slice through the system and it is the technical authority for a specific business capability; therefore, UI, presentation logic, business logic and data storage for that business capability is contained within the boundaries of the service and the actual data does not leak out of the service boundaries.
 
 A service is generally comprised of a single business component with its own data store. Occasionaly, a service can have more than one business component- I will discuss this in the next section. Note: if there are more than one business component, each should have its own data store. A business component consists of a number of autonomous components, each with a single responsibility. These do not have their own data stores but share the one used by their business component. These autonomous components should not depend on each other to facilitate managing and deploying them separately.
 
-As Udi Dahan stated [here](), the only difference between a Microservice and an Autonomous Component is that ACs are not physical units of deployment. 
+As Udi Dahan stated [here](), the only difference between a Microservice and an Autonomous Component is that ACs are not physical units of deployment. This is because multiple ACs can exist in an endpoint.
+
+
 
 #### Testing
 - No unit tests
