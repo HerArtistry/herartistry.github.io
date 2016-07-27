@@ -16,18 +16,20 @@ As Udi Dahan stated [here](), the only difference between a Microservice and an 
 
 
 #### Testing
-- No unit tests
+- No unit tests. 
 following this style of architecture, we have found that unit tests do not add a lot of value. The ACs are independent, small and have a single responsibility. Additionally, since the system is divided into numerous vertical services, the number of tests per services are fairly small and could be covered by higher level tests (integration, acceptance, etc...) alone without worrying that tests would take too long to run.
 
 - Integration and Smoke tests only
 
 #### Dependency Management 
-- No IOC 
+- No IOC
+
 Autonomous components do not depend on each other and are not expected to be modified. If an AC needs to change, it is simply replaced by a new AC - you can think of this as applying the Open/Close principle to services, in a way.
 
 This does not mean there are no shared dependencies at all but they are so few that a full blown IOC container is more than an overkill. So, how to manage those dependencies? Well, there are a few options but the main one is to just hardcode them as Ayende Rahien states [here](add link). This might seem totally wrong but in this style of architecture, dependencies are few and fairly stable. Another way to manage dependencies is by using partial functions.
 
 - partial functions (examples in a future post)
+
 I first came across this in the excellent [8 lines of code presentation](add link) by Greg Young. Basically, you create a unified interface between your implementations and use closures to wrap your dependecies in the composition root. You can easily configure life management of your dependencies and inject the composed object into your applicable seams. This has been covered in several blogs so I am not going to delve into this any deeper.
 
 #### DRY (Don't Repeat Yourself)
