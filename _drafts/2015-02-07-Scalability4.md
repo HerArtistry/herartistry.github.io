@@ -14,12 +14,9 @@ A service is generally comprised of a single business component with its own dat
 As Udi Dahan stated [here](), the only difference between a Microservice and an Autonomous Component is that ACs are not physical units of deployment. This is because multiple ACs can exist in a single endpoint.
 
 
-
 #### Testing
 - No unit tests. 
 following this style of architecture, we have found that unit tests do not add a lot of value. The ACs are independent, small and have a single responsibility. Additionally, since the system is divided into numerous vertical services, the number of tests per services are fairly small and could be covered by higher level tests (integration, acceptance, etc...) alone without worrying that tests would take too long to run.
-
-- Integration and Smoke tests only
 
 #### Dependency Management 
 ##### No IOC
@@ -33,7 +30,7 @@ This does not mean there are no shared dependencies at all but they are so few t
 I first came across this in the excellent [8 lines of code presentation](add link) by Greg Young. Basically, you create a unified interface between your implementations and use closures to wrap your dependecies in the composition root. You can easily configure life management of your dependencies and inject the composed object into your applicable seams. This has been covered in several blogs so I am not going to delve into this any deeper.
 
 #### DRY (Don't Repeat Yourself)
-We all know the benefits of DRY, so I am not going to repeat them here, but in a SOA implementation DRY should be exhibited within the service boundaries only. This is because we go to great lengths to ensure that services are not coupled together and that the ripple effect of change is minimal; hence, re-using and sharing the same components risks undoing all that work. Besides, most of the time, these services grow to do things differently, and the once identical functionalites turn out not to be so similar after all. In my experience, if the .... talk about stable shared code and ok to copy n paste....
+We all know the benefits of DRY, so I am not going to repeat them here, but in a SOA implementation DRY should be exhibited within the service boundaries only. This is because we go to great lengths to ensure that services are not coupled together and that the ripple effect of change is minimal; hence, re-using and sharing the same components risks undoing all that work. Besides, most of the time, these services grow to do things differently, and the once identical functionalites turn out not to be so similar after all.
 
 Before digging deeper it is probably worth discussing how our system looks like as well as the internals of the services.
 
