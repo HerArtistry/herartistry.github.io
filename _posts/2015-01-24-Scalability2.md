@@ -7,7 +7,9 @@ tags: [SOA, Service Oriented Architecture, Scalability]
 
 In the [previous post](http://www.ashrafmageed.com/Scalability/) in this series, I wrote about scaling up vs out, why we chose scaling out and why layered service models are not the answer. In this post, I will delve deeper into vertical services and how they help with scaling out strategies.
 
+
 #### Services in Service Oriented Architectures ####
+
 If you are working with SOAs, then I highly recommend attending Udi Dahan's Advanced Distributed Systems Design course, or alternatively buying the recordings. 
 
 So, what is a service?  as Udi states it: "a service is the technical authority for a specific business capability". What does this mean? It means the UI, presentation logic, business logic and data storage for that business capability is contained within the boundaries of the service and the actual data does not leak out of the service boundaries. Why? There are numerous advantages for doing this:
@@ -29,7 +31,7 @@ Adopting this approach means the overall system is divided into vertical slices,
 
 **Document messages** simply transfer data between services but do not dictate what the receiver should do with the data. They usually represent business documents, say an IncidentReport or a PurchaseOrder, and contain all the information pertaining to that document from all the relevant services, each service will act on and/or fill in the parts it knows about. As stated above, data should not leak out of the service boundaries; this immediately rules out document messages for communication between services. Moreover, there are numerous advantages in having thin messages that I will cover in a future post.
 
-####Command Messages vs Event Messages####
+#### Command Messages vs Event Messages ####
 Events represent things that have already happened and, therefore, cannot be undone (e.g. UserCreated) - well, can be undone through a corrective action/command, e.g. InactivateUser. Commands are instructions to carry out an action and can be rejected (e.g. CreateUser). Command messages create coupling between services as the command instigator service knows which service can fulfil the command and what that service should do in processing a command. As bill Poole states [here](http://bill-poole.blogspot.co.uk/2008/04/avoid-command-messages.html):
 
 >The fact that Service A is instructing Service B what to do means that Service A determines what shall be done, whereas Service B decides how it shall be done. This is a subtle but important form of coupling.
@@ -44,7 +46,7 @@ A system based on command messages as the form of communication will quickly bec
 
 This is exactly why Event messages are preferred as they eliminate this coupling. Using the above example, if Service A's activity requires service B. Then service A fires an event that service B is subscribed to. Service B then carries out its part using information stored within it when it handles that event. If another service is now needed, it simply subscribes to the event and executes its part when the event is fired.
 
-####Event-Driven Architecture and SOA####
+#### Event-Driven Architecture and SOA ####
 As stated on this MSDN article, "Event-driven architecture is an architectural style that builds on the fundamental aspects of event notifications to facilitate immediate information dissemination and reactive business process execution." Event-Driven architecture and SOA are two different and independent architectural styles. You can do any of the two without the other but combining them yields great benefits. Basically, services in Event-Driven SOA generally communicate through events. A service fires an event describing a meaningful state change, and other interested service subscribe to such events and carry out any necessary actions required when such an event is fired. This is a very powerful architecture that allows significant scalability and decouples the services in the system as the service that fires the event does not know, and does not care, which other services are consuming this event and why. This result in low temporal and behavioural coupling.
 
 **Temporal coupling** is where dependant services have to be available when a message is sent to them; while **Behavioural Coupling** is when services determine what other services should do and how. Ian Robinson wrote a wonderful article about [temporal and behavioural coupling](http://iansrobinson.com/2009/04/27/temporal-and-behavioural-coupling/) that I strongly recommend reading. He depicts temporal coupling and behavioural coupling on a matrix with event-based systems occupying the quadrant with low coupling on both and command-based systems on the low temporal coupling but high behavioural coupling.
