@@ -47,3 +47,4 @@ A user registration process may consist of creating users, creating their log-in
 
 ***Note: As stated in the previous post in this series, you need to be judicious in your use of commands as they create coupling. However, commands are perfectly fine within the service boundaries, which is where the UI is. Hence, the above commands from the composite UI to the corresponding services are acceptable in vertical SOA services.***
 
+
