@@ -50,3 +50,4 @@ This does not mean I have stopped using IOC containers, I have just started usin
 Jimmy Bogard summarises good IOC usage very well:
 
 >Ultimately, successful container usage comes down to proper OO, limiting abstractions and focusing on concepts. Composition can be achieved in many forms – often supported directly in the language, such as pattern matching or mixins – but no language has it perfect so being able to still rely on dependency injection without a lot of fuss can be extremely powerful.
+
