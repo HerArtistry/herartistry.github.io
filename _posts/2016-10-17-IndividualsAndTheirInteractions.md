@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Individuals and their Interactions
-comments: false
+comments: true
 tags: [Agile]
 ---
 In this post, I would like to share my recent experience in a project that failed miserably, mainly due to negligence of the "Individuals and their Interactions" principle.
