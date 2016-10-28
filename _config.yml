@@ -8,8 +8,7 @@ url:        http://www.ashrafmageed.com
 # Jekyll configuration
 
 permalink:   /:categories/:title/
-markdown:    kramdown
-highlighter: pygments
+
 sass:
   sass_dir: _sass
   style: compressed
@@ -17,11 +16,13 @@ gems:
   - jekyll-sitemap
 
 kramdown:
-  auto_ids: true
-  footnote_nr: 1
-  entity_output: as_char
-  toc_levels: 1..6
-  use_coderay: false
+  # Use GitHub flavored markdown, including triple backtick fenced code blocks
+  input: GFM
+  # Jekyll 3 and GitHub Pages now only support rouge for syntax highlighting
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    # Use existing pygments syntax highlighting css
+    css_class: 'highlight'
 
 
 # Site owner
