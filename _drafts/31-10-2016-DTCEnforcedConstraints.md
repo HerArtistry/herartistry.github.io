@@ -5,7 +5,7 @@ comments: true
 tags: [SOA, Service Oriented Architecture, Scalability, Transactions, DTC, MSDTC]
 ---
 
-There are numerous blogs and talks out there talking about why you should or should not use distributed transactions coordinators (DTC) and they cover a myriad of topics, detailing the pros and cons. However, what most of them fail to mention - or not give enough air time to - is the fact that DTC locks you down in terms of the technology you can use. This is an issue that is constantly overlooked and can cause you a lot of issues down the line.
+There are numerous blogs and talks out there about why you should or should not use distributed transaction coordinators (DTC) and they cover a myriad of topics, detailing the pros and cons. However, what most of them fail to mention - or not give enough air time to - is the fact that DTC locks you down in terms of the technology you can use. This is an issue that is constantly overlooked and can cause you a lot of issues down the line.
 
 I was involved in developing/architecting a SOA system on top of NServiceBus and MSMQ and we were contemplating whether to go down the DTC route or not. After considering the two alternatives - and significant research - we decided to choose DTC. This is due to: 
 - Time constraints
