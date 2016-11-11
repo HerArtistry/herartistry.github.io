@@ -10,7 +10,8 @@ In [part 2](http://www.ashrafmageed.com/Scalability2), I briefly covered Event-D
 ###Only operate on local data
 In order to ensure services are autonomous, they should only operate on local data. That is data they are the technical authority of. This, among other things, eliminates the need for RPC and request/response as well as Temporal and Behavioural coupling (to recap read [part 2](http://www.ashrafmageed.com/Scalability2) of this series). 
 
-###Only Share IDs
+###Only Share IDs###
+
 As stated in part 2, data should not leak outside the service boundaries and service communicate through events. So what does an event contain? IDs only. This has numerous benefits:
 
 - **No logical coupling:** the event messages are not responsible for information from multiple services
@@ -46,7 +47,7 @@ There are numerous JavaScript libraries that generate unique GUIDs; however, If,
 
 What happens when the composite UI consists of multiple server calls that all pass apart from one? The commands are not handled synchronously and if they pass validation they are assumed successful. In other words, we only validate the commands and return. If any of the commands fail validation, we display an error message to the end user. Otherwise, a success message is displayed as valid commands should almost always be processed successfully and compensating actions are defined to deal with failures. I will go into more details in a future post.
 
-####UI Composition Example
+####UI Composition Example####
 
 A user registration process may consist of creating users, creating their log-in credentials, e-mailing the users a link to re-set their passwords. Traditionally, this may be presented as a wizard with a linear, synchronous process where each step needs to be completed in order to move to the next step. In Event-Driven SOA with Composite UIs, the create user screen is an amalgamation of the users and credentials services, each providing inputs to capture the data they are responsible for. A user ID is generated client-side when the end-user navigates to this screen, subsequently, the users' details and credentials are  asynchronously, and simultaneously, saved to their corresponding services along with the user ID. Once the user is created by the users service, a UserCreated event containing only the user ID  is fired. The credentials service, which is subscribed to this event, then uses the user ID contained in the event to retrieve the user's credentials, it then creates a reset password token (just a Guid ID) and composes the credentials' specific password reset e-mail. It subsequently sends a command to the e-mail service to send the e-mail. The reason we can fire a UserCreated event with just an ID, is that all the user's relevant credentials information is already saved in the credentials service through the **Composite UI**.
 
