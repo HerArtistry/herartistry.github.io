@@ -1,8 +1,8 @@
 # Site wide configuration
 
-title:            Ashraf Mageed
+title:            Shushu Mageed
 locale:           en_GB
-url:        http://www.ashrafmageed.com      
+url:        http://www.shushumageed.com      
 
 
 # Jekyll configuration
@@ -27,11 +27,11 @@ kramdown:
 
 # Site owner
 owner:
-  name: Ashraf Mageed
+  name: Shushu Mageed
   avatar: Avatar.png
-  bio: "EventSourcing, DDD and Microservices"
+  bio: "Coming soon..."
   email: 
-  disqus-shortname: ashrafmageed
+  disqus-shortname: shushu_mageed
   twitter: #username
   facebook: #username
   google:
