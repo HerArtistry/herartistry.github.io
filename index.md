@@ -3,6 +3,6 @@ layout: home
 excerpt: "Makeup"
 tags: [Makeup]
 image:
-  feature: Shushu Mageed.png
+  feature: ShushuHome.png
   credit: Author
 ---
